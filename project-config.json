@@ -1,0 +1,277 @@
+{
+  "project": {
+    "name": "MultiLingo Talk",
+    "description": "モバイル対応の多言語音声会話練習アプリケーション",
+    "version": "0.1.0",
+    "status": "planning",
+    "createdAt": "2025-11-29",
+    "author": "Your Name"
+  },
+  "techStack": {
+    "frontend": {
+      "framework": "React 18+",
+      "language": "TypeScript",
+      "buildTool": "Vite",
+      "uiLibrary": ["Material-UI", "Chakra UI"],
+      "stateManagement": ["Redux Toolkit", "Context API"],
+      "httpClient": "Axios",
+      "routing": "React Router",
+      "visualization": "Recharts",
+      "testing": {
+        "unit": "Jest + React Testing Library",
+        "e2e": "Playwright / Cypress"
+      }
+    },
+    "backend": {
+      "framework": "FastAPI",
+      "language": "Python 3.10+",
+      "orm": "SQLAlchemy",
+      "validation": "Pydantic",
+      "database": "SQLite",
+      "aiModels": ["OpenAI GPT-4", "Claude API"],
+      "speechServices": ["Google Cloud Speech-to-Text", "Google Cloud Text-to-Speech", "OpenAI Whisper"],
+      "testing": "pytest"
+    },
+    "infrastructure": {
+      "containerization": "Docker",
+      "orchestration": "Docker Compose",
+      "cicd": "GitHub Actions",
+      "frontendDeployment": ["Vercel", "Netlify"],
+      "backendDeployment": ["Railway", "Render", "AWS", "Google Cloud Run"]
+    }
+  },
+  "phases": [
+    {
+      "phase": 1,
+      "name": "環境構築・基盤開発",
+      "duration": "1-2週間",
+      "status": "pending",
+      "tasks": [
+        "Reactプロジェクトセットアップ",
+        "FastAPIプロジェクトセットアップ",
+        "TypeScript設定",
+        "UIライブラリインストール",
+        "ルーティング設定",
+        "基本レイアウトコンポーネント作成",
+        "SQLiteデータベース設計",
+        "Docker設定",
+        "ドキュメント作成"
+      ]
+    },
+    {
+      "phase": 2,
+      "name": "音声機能実装",
+      "duration": "2-3週間",
+      "status": "pending",
+      "tasks": [
+        "Web Speech API統合",
+        "マイク権限処理",
+        "録音コンポーネント作成",
+        "音声再生コンポーネント作成",
+        "音声認識エンドポイント実装",
+        "音声合成エンドポイント実装",
+        "キャッシング機能実装"
+      ]
+    },
+    {
+      "phase": 3,
+      "name": "会話AI機能実装",
+      "duration": "2-3週間",
+      "status": "pending",
+      "tasks": [
+        "AIモデルAPI統合",
+        "会話コンテキスト管理",
+        "プロンプトエンジニアリング",
+        "チャットUI実装",
+        "メッセージ送受信処理",
+        "会話履歴管理API"
+      ]
+    },
+    {
+      "phase": 4,
+      "name": "学習支援機能実装",
+      "duration": "2週間",
+      "status": "pending",
+      "tasks": [
+        "発音評価API実装",
+        "文法チェックAPI実装",
+        "語彙提案API実装",
+        "フィードバックUI作成",
+        "進捗ダッシュボード作成",
+        "統計グラフ実装"
+      ]
+    },
+    {
+      "phase": 5,
+      "name": "データ永続化・管理",
+      "duration": "1週間",
+      "status": "pending",
+      "tasks": [
+        "SQLiteスキーマ確定",
+        "マイグレーション実装",
+        "バックアップ機能実装",
+        "エクスポート機能実装",
+        "ローカルストレージ管理"
+      ]
+    },
+    {
+      "phase": 6,
+      "name": "モバイル最適化・UI/UX改善",
+      "duration": "1-2週間",
+      "status": "pending",
+      "tasks": [
+        "レスポンシブデザイン調整",
+        "タッチ操作最適化",
+        "パフォーマンス最適化",
+        "PWA対応",
+        "アクセシビリティ対応",
+        "ダークモード実装"
+      ]
+    },
+    {
+      "phase": 7,
+      "name": "テスト・デバッグ",
+      "duration": "1-2週間",
+      "status": "pending",
+      "tasks": [
+        "ユニットテスト実装（フロント）",
+        "E2Eテスト実装",
+        "ブラウザ互換性テスト",
+        "モバイルテスト",
+        "ユニットテスト実装（バック）",
+        "APIテスト",
+        "負荷テスト",
+        "セキュリティテスト"
+      ]
+    },
+    {
+      "phase": 8,
+      "name": "デプロイ・運用準備",
+      "duration": "1週間",
+      "status": "pending",
+      "tasks": [
+        "本番環境セットアップ",
+        "CI/CDパイプライン構築",
+        "監視・ロギング設定",
+        "ドキュメント整備",
+        "リリースプロセス確立"
+      ]
+    }
+  ],
+  "features": {
+    "core": [
+      "ユーザー管理",
+      "音声入出力",
+      "会話機能",
+      "多言語対応"
+    ],
+    "supportive": [
+      "学習支援機能",
+      "UI/UX最適化",
+      "データ管理",
+      "分析・統計"
+    ],
+    "optional": [
+      "PWA対応",
+      "ダークモード",
+      "アクセシビリティ"
+    ]
+  },
+  "languages": [
+    "English",
+    "日本語",
+    "中文 (Mandarin)",
+    "한국어",
+    "Español",
+    "Français"
+  ],
+  "difficulty_levels": [
+    "Beginner",
+    "Intermediate",
+    "Advanced"
+  ],
+  "topics": [
+    "Daily Conversation",
+    "Business",
+    "Travel",
+    "Technology",
+    "Custom"
+  ],
+  "apis": {
+    "external": [
+      {
+        "name": "OpenAI API",
+        "service": "GPT-4 / Whisper",
+        "purpose": "AI会話生成・音声認識",
+        "required": true
+      },
+      {
+        "name": "Claude API",
+        "service": "Claude 3",
+        "purpose": "AI会話生成（代替案）",
+        "required": false
+      },
+      {
+        "name": "Google Cloud Speech-to-Text",
+        "service": "音声認識",
+        "purpose": "高精度な音声テキスト変換",
+        "required": true
+      },
+      {
+        "name": "Google Cloud Text-to-Speech",
+        "service": "音声合成",
+        "purpose": "多言語音声生成",
+        "required": true
+      }
+    ]
+  },
+  "environments": {
+    "development": {
+      "frontend_url": "http://localhost:5173",
+      "backend_url": "http://localhost:8000",
+      "database": "sqlite:///./test.db"
+    },
+    "staging": {
+      "frontend_url": "https://staging.multilingo-talk.com",
+      "backend_url": "https://api-staging.multilingo-talk.com",
+      "database": "PostgreSQL (staging)"
+    },
+    "production": {
+      "frontend_url": "https://multilingo-talk.com",
+      "backend_url": "https://api.multilingo-talk.com",
+      "database": "PostgreSQL (production)"
+    }
+  },
+  "git": {
+    "repository": "https://github.com/yourusername/multilingo-talk.git",
+    "branches": {
+      "main": "本番環境",
+      "develop": "開発環境",
+      "feature/*": "機能開発",
+      "hotfix/*": "緊急バグ修正"
+    },
+    "conventions": {
+      "commits": "Conventional Commits",
+      "versioning": "Semantic Versioning"
+    }
+  },
+  "testing": {
+    "target_coverage": 80,
+    "frameworks": {
+      "frontend": ["Jest", "React Testing Library", "Playwright"],
+      "backend": ["pytest", "pytest-asyncio", "pytest-cov"]
+    }
+  },
+  "performance": {
+    "frontend": {
+      "bundle_size_limit": "200KB",
+      "first_contentful_paint": "< 1.5s",
+      "time_to_interactive": "< 3s"
+    },
+    "backend": {
+      "api_response_time": "< 500ms (p95)",
+      "database_query_time": "< 100ms (p95)",
+      "concurrent_users": 1000
+    }
+  }
+}

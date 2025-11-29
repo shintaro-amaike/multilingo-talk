@@ -1,0 +1,359 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+env:
+  NODE_VERSION: '20'
+  PYTHON_VERSION: '3.10'
+
+jobs:
+  # ===== FRONTEND TESTS =====
+  frontend-test:
+    name: Frontend - Unit Tests & Linting
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: 'frontend/package-lock.json'
+
+      - name: Install dependencies
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: Lint code
+        working-directory: ./frontend
+        run: npm run lint
+
+      - name: Run unit tests
+        working-directory: ./frontend
+        run: npm test -- --run --reporter=verbose
+
+      - name: Generate coverage report
+        working-directory: ./frontend
+        run: npm run test:coverage
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./frontend/coverage/coverage-final.json
+          flags: frontend
+          name: frontend-coverage
+
+  # ===== FRONTEND E2E TESTS =====
+  frontend-e2e:
+    name: Frontend - E2E Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: 'frontend/package-lock.json'
+
+      - name: Install dependencies
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: Install Playwright browsers
+        working-directory: ./frontend
+        run: npx playwright install --with-deps
+
+      - name: Build frontend
+        working-directory: ./frontend
+        run: npm run build
+
+      - name: Run E2E tests
+        working-directory: ./frontend
+        run: npm run test:e2e
+
+      - name: Upload E2E test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: frontend/e2e-results/
+
+  # ===== FRONTEND BUILD =====
+  frontend-build:
+    name: Frontend - Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: 'frontend/package-lock.json'
+
+      - name: Install dependencies
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: Build application
+        working-directory: ./frontend
+        run: npm run build
+
+      - name: Check bundle size
+        working-directory: ./frontend
+        run: |
+          SIZE=$(du -sh dist | cut -f1)
+          echo "📦 Bundle size: $SIZE"
+          if [ $(du -s dist | cut -f1) -gt 5000 ]; then
+            echo "⚠️ Warning: Bundle size exceeds 5MB"
+          fi
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-build
+          path: frontend/dist/
+
+  # ===== BACKEND TESTS =====
+  backend-test:
+    name: Backend - Unit Tests & Linting
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Install dependencies
+        working-directory: ./backend
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Lint with flake8
+        working-directory: ./backend
+        run: |
+          pip install flake8
+          flake8 app/ --count --select=E9,F63,F7,F82 --show-source --statistics
+          flake8 app/ --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
+      - name: Run unit tests
+        working-directory: ./backend
+        run: pytest tests/ -v --tb=short
+
+      - name: Generate coverage report
+        working-directory: ./backend
+        run: pytest tests/ --cov=app --cov-report=xml --cov-report=term
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./backend/coverage.xml
+          flags: backend
+          name: backend-coverage
+
+  # ===== BACKEND BUILD =====
+  backend-build:
+    name: Backend - Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        working-directory: ./backend
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Build Docker image
+        run: |
+          cd backend
+          docker build -t multilingo-backend:latest .
+
+      - name: Check Python dependencies
+        working-directory: ./backend
+        run: pip check
+
+  # ===== DOCKER BUILD & PUSH =====
+  docker-build:
+    name: Docker - Build & Push
+    runs-on: ubuntu-latest
+    needs: [frontend-build, backend-build]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push frontend image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          push: ${{ github.event_name == 'push' }}
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/multilingo-frontend:latest
+            ${{ secrets.DOCKER_USERNAME }}/multilingo-frontend:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build and push backend image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          push: ${{ github.event_name == 'push' }}
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/multilingo-backend:latest
+            ${{ secrets.DOCKER_USERNAME }}/multilingo-backend:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ===== SECURITY SCANNING =====
+  security-scan:
+    name: Security - Vulnerability Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+
+      - name: Upload Trivy results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+  # ===== CODE QUALITY =====
+  code-quality:
+    name: Code Quality - Analysis
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run SonarCloud scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  # ===== DEPLOYMENT (Main branch only) =====
+  deploy:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [frontend-test, frontend-e2e, backend-test, security-scan]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download frontend build
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-build
+          path: ./frontend/dist/
+
+      - name: Deploy to Vercel (Frontend)
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          working-directory: ./frontend
+
+      - name: Deploy to Railway (Backend)
+        run: |
+          if [ ! -z "${{ secrets.RAILWAY_TOKEN }}" ]; then
+            echo "Deploying backend to Railway..."
+            # Railway deployment via CLI
+            npm install -g @railway/cli
+            railway link ${{ secrets.RAILWAY_PROJECT_ID }}
+            railway up --service multilingo-backend
+          fi
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+
+  # ===== NOTIFICATION =====
+  notify:
+    name: Notify - Status Check
+    runs-on: ubuntu-latest
+    needs: [frontend-test, frontend-e2e, backend-test]
+    if: always()
+
+    steps:
+      - name: Check job status
+        run: |
+          if [ "${{ needs.frontend-test.result }}" == "failure" ] || \
+             [ "${{ needs.frontend-e2e.result }}" == "failure" ] || \
+             [ "${{ needs.backend-test.result }}" == "failure" ]; then
+            echo "❌ CI/CD Pipeline Failed"
+            exit 1
+          else
+            echo "✅ CI/CD Pipeline Passed"
+          fi
+
+      - name: Send Slack notification
+        if: always()
+        uses: slackapi/slack-github-action@v1
+        with:
+          webhook-url: ${{ secrets.SLACK_WEBHOOK }}
+          payload: |
+            {
+              "text": "CI/CD Pipeline Notification",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "${{ job.status == 'success' && '✅' || '❌' }} *${{ github.repository }}*\n*Branch:* ${{ github.ref_name }}\n*Commit:* ${{ github.sha }}"
+                  }
+                }
+              ]
+            }

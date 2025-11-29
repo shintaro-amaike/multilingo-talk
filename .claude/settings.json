@@ -1,0 +1,19 @@
+{
+  "model": "claude-sonnet-4-5-20250929",
+  "outputStyle": "Concise",
+  "permissions": {
+    "defaultMode": "acceptEdits",
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(./secrets/**)",
+      "Read(./.aws/**)",
+      "Bash(curl:*)",
+      "Bash(wget:*)"
+    ]
+  },
+  "env": {
+    "DISABLE_NON_ESSENTIAL_MODEL_CALLS": "1",
+    "DISABLE_COST_WARNINGS": "0"
+  }
+}
