@@ -5,7 +5,7 @@ Handles caching of TTS and speech recognition results
 
 import hashlib
 import json
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Optional, Dict, Any
 import logging
 
@@ -17,13 +17,13 @@ class CacheItem:
 
     def __init__(self, data: Any, ttl_seconds: int = 604800):  # 7 days default
         self.data = data
-        self.created_at = datetime.utcnow()
+        self.created_at = datetime.now(timezone.utc)
         self.ttl = ttl_seconds
 
     def is_expired(self) -> bool:
         """Check if cache item has expired"""
         expiry_time = self.created_at + timedelta(seconds=self.ttl)
-        return datetime.utcnow() > expiry_time
+        return datetime.now(timezone.utc) > expiry_time
 
 
 class CacheService:

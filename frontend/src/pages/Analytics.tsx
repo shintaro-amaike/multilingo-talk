@@ -188,7 +188,8 @@ const Analytics: React.FC = () => {
 
       {/* Progress Tab */}
       <TabPanel value={tabValue} index={1}>
-      <Grid item xs={12} md={8}>
+      <Grid container spacing={3}>
+        <Grid item xs={12} md={8}>
           <Card>
             <CardContent>
               <Typography variant="h6" gutterBottom>

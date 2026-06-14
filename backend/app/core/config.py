@@ -12,11 +12,12 @@ class Settings(BaseSettings):
     # Database
     DATABASE_URL: str = "sqlite:///./multilingo_talk.db"
 
-    # CORS
-    CORS_ORIGINS: list = ["*"]
+    # CORS - Configure for production
+    CORS_ORIGINS: list = os.getenv("CORS_ORIGINS", "*").split(",") if os.getenv("CORS_ORIGINS") else ["http://localhost:5173", "http://localhost:3000"]
 
     # Security
-    SECRET_KEY: str = os.getenv("SECRET_KEY", "your-secret-key-change-in-production")
+    # WARNING: Must set SECRET_KEY environment variable in production
+    SECRET_KEY: str = os.getenv("SECRET_KEY", "dev-secret-key-DO-NOT-USE-IN-PRODUCTION-CHANGE-THIS")
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 

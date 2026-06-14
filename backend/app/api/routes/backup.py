@@ -3,7 +3,7 @@ Backup and Export Routes
 Handles data backup, restore, and export functionality
 """
 
-from fastapi import APIRouter, Depends, HTTPException, FileResponse
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from pydantic import BaseModel

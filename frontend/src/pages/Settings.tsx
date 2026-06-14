@@ -14,7 +14,7 @@ import {
   Tab,
 } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../store/store';
+import type { RootState } from '../store/store';
 import {
   toggleDarkMode,
   toggleSound,

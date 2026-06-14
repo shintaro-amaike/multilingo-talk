@@ -289,4 +289,51 @@ class AIService:
 
 
 # Global instance
+    def transcribe_audio(
+        self,
+        file_path: str,  # or binary-like object if supported by client
+        language: str = "en"
+    ) -> Optional[str]:
+        """
+        Transcribe audio using OpenAI Whisper
+        """
+        if not self.available:
+            logger.warning("STT not available")
+            return None
+        
+        try:
+            with open(file_path, "rb") as audio_file:
+                transcript = self.client.audio.transcriptions.create(
+                    model="whisper-1",
+                    file=audio_file,
+                    language=language if language != "auto" else None
+                )
+            return transcript.text
+        except Exception as e:
+            logger.error(f"Error transcribing audio: {str(e)}")
+            return None
+
+    def synthesize_speech(
+        self,
+        text: str,
+        voice: str = "alloy"
+    ) -> Optional[bytes]:
+        """
+        Synthesize speech using OpenAI TTS
+        """
+        if not self.available:
+            logger.warning("TTS not available")
+            return None
+
+        try:
+            response = self.client.audio.speech.create(
+                model="tts-1",
+                voice=voice,
+                input=text
+            )
+            return response.content
+        except Exception as e:
+            logger.error(f"Error synthesizing speech: {str(e)}")
+            return None
+
 ai_service = AIService()

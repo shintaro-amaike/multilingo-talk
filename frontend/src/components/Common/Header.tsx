@@ -3,7 +3,7 @@ import { AppBar, Toolbar, Typography, IconButton, Box } from '@mui/material';
 import { Brightness4, Brightness7, Menu } from '@mui/icons-material';
 import { useDispatch, useSelector } from 'react-redux';
 import { toggleDarkMode } from '../../store/settingsSlice';
-import { RootState } from '../../store/store';
+import type { RootState } from '../../store/store';
 
 interface HeaderProps {
   onMenuClick?: () => void;

@@ -1,15 +1,24 @@
-fastapi==0.104.1
-uvicorn[standard]==0.24.0
-pydantic==2.5.0
-pydantic-settings==2.1.0
-sqlalchemy==2.0.23
-python-dotenv==1.0.0
-pytest==7.4.3
-pytest-asyncio==0.21.1
-pytest-cov==4.1.0
-httpx==0.25.2
+# Core Framework - Python 3.14 compatible
+fastapi==0.115.12
+uvicorn[standard]==0.34.0
+pydantic==2.10.6
+pydantic-settings==2.7.1
+sqlalchemy==2.0.36
+python-dotenv==1.0.1
 
-# Optional dependencies for future phases
-# openai==1.3.0
-# google-cloud-speech==2.20.0
-# google-cloud-texttospeech==2.14.0
+# Testing
+pytest==8.3.4
+pytest-asyncio==0.25.2
+pytest-cov==6.0.0
+httpx==0.28.1
+
+# Authentication & Security
+# Note: python-jose is unmaintained. Consider migrating to PyJWT in the future.
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+python-multipart==0.0.20
+
+# AI Services
+openai==1.59.9
+# google-cloud-speech==2.29.0
+# google-cloud-texttospeech==2.20.0

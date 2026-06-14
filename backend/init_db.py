@@ -2,7 +2,7 @@
 
 from app.database.base import Base
 from app.database.session import engine
-from app.models import User, Conversation, Message, Setting
+from app.models import User, Conversation, Message, Setting, Flashcard
 
 def init_db():
     """Create all tables"""

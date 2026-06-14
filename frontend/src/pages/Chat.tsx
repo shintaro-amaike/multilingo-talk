@@ -17,7 +17,7 @@ import {
 import { Send, Translate, Home as HomeIcon } from '@mui/icons-material';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { RootState } from '../store/store';
+import type { RootState } from '../store/store';
 import { addMessage, setLoading, setError } from '../store/conversationSlice';
 import { messageAPI } from '../services/api';
 import { RecordButton } from '../components/Voice';
